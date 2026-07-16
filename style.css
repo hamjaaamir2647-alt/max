@@ -1,0 +1,57 @@
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f6f9;
+}
+
+.container{
+    max-width:700px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h1{
+    color:#2563eb;
+    text-align:center;
+}
+
+p{
+    color:#666;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    font-size:18px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    box-sizing:border-box;
+}
+
+button{
+    padding:14px 20px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:15px;
+    margin-right:10px;
+}
+
+#micBtn{
+    background:#ef4444;
+    color:white;
+}
+
+#saveBtn{
+    background:#2563eb;
+    color:white;
+}
+
+#status{
+    margin-top:20px;
+    font-weight:bold;
+}
