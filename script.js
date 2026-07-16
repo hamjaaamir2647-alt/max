@@ -1,6 +1,6 @@
 alert("MAX JS Loaded");
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxmO2Q7ifgwBGMQoqYool1bRM8m7F4CmkApg_1gH3Ff8xQmo4tVZaDA6jURuVmrHHyR/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzXjcvt5x4Erkh5bYQzjrdlTCjjAK_PHhXy6Cx06TJaZvCHhJZlg8JxUHRkk67J9B8S/exec";
 
 const saveBtn = document.getElementById("saveBtn");
 const command = document.getElementById("command");
