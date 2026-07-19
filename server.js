@@ -83,15 +83,38 @@ app.post("/payment", async (req, res) => {
     // Example:
     // Paid ₹5000 to Rajesh from SBI by PhonePe
 
-    const amountMatch = command.match(/₹?\s?(\d+)/i);
-    const nameMatch = command.match(/to\s+(.+?)\s+from/i);
-    const bankMatch = command.match(/from\s+(.+?)\s+by/i);
-    const modeMatch = command.match(/by\s+(.+)$/i);
+    const response = await client.chat.completions.create({
+  model: "gpt-4.1-mini",
+  messages: [
+    {
+      role: "system",
+      content: `Extract payment details and return ONLY valid JSON.
+Format:
+{
+  "labour":"",
+  "amount":"",
+  "bank":"",
+  "mode":""
+}`
+    },
+    {
+      role: "user",
+      content: command
+    }
+  ],
+  temperature: 0,
+});
 
-    const amount = amountMatch ? amountMatch[1] : "";
-    const labour = nameMatch ? nameMatch[1].trim() : "";
-    const bank = bankMatch ? bankMatch[1].trim() : "";
-    const mode = modeMatch ? modeMatch[1].trim() : "";
+const content = response.choices[0].message.content.trim();
+
+console.log("AI Response:", content);
+
+const ai = JSON.parse(content);
+
+const labour = ai.labour || "";
+const amount = ai.amount || "";
+const bank = ai.bank || "";
+const mode = ai.mode || "";
 
     // =====================
     // Validate Labour
