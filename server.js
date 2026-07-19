@@ -29,6 +29,8 @@ app.post("/payment", async (req, res) => {
     // ==========================
 
     const labours = await getLabours();
+ console.log("Labours found:", labours.length);
+console.log(labours);
 
     const matches = labours.filter(
       l => l.name.toLowerCase() === labour.toLowerCase()
