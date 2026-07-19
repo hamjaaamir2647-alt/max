@@ -66,25 +66,29 @@ app.post("/payment", async (req, res) => {
     const bank = bankMatch ? bankMatch[1].trim() : "";
     const mode = modeMatch ? modeMatch[1].trim() : "";
 
-    const date = new Date().toLocaleString("en-IN");
+    const now = new Date();
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:F`,
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values: [
-          [
-            date,
-            labour,
-            amount,
-            bank,
-            mode,
-            command,
-          ],
-        ],
-      },
-    });
+const date = now.toLocaleDateString("en-GB");
+const time = now.toLocaleTimeString("en-GB");
+
+await sheets.spreadsheets.values.append({
+  spreadsheetId: SPREADSHEET_ID,
+  range: `${SHEET_NAME}!A:G`,
+  valueInputOption: "USER_ENTERED",
+  requestBody: {
+    values: [
+      [
+        date,      // Date
+        time,      // Time
+        labour,    // Labour Name
+        amount,    // Amount
+        bank,      // Bank
+        mode,      // Payment Method
+        ""         // Remarks (leave blank)
+      ],
+    ],
+  },
+});
 
     res.json({
       success: true,
