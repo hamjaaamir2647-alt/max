@@ -1,45 +1,3 @@
-const express = require("express");
-const cors = require("cors");
-const { google } = require("googleapis");
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-// =====================
-// Google Authentication
-// =====================
-
-const auth = new google.auth.GoogleAuth({
-  credentials: {
-    project_id: process.env.GOOGLE_PROJECT_ID,
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-  },
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
-
-const sheets = google.sheets({
-  version: "v4",
-  auth,
-});
-
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
-const SHEET_NAME = "Labour Payments";
-
-// =====================
-// Home
-// =====================
-
-app.get("/", (req, res) => {
-  res.send("✅ MAX API is running!");
-});
-
-// =====================
-// Payment API
-// =====================
-
 app.post("/payment", async (req, res) => {
   try {
     const { command } = req.body;
@@ -58,7 +16,7 @@ app.post("/payment", async (req, res) => {
 
     const amountMatch = command.match(/₹?\s?(\d+)/i);
     const nameMatch = command.match(/to\s+([A-Za-z ]+?)\s+from/i);
-    const bankMatch = command.match(/from\s+([A-Za-z ]+?)\s+by/i);
+    const bankMatch = command.match(/from\s+([A-Za-z0-9 ]+?)\s+by/i);
     const modeMatch = command.match(/by\s+(.+)$/i);
 
     const amount = amountMatch ? amountMatch[1] : "";
@@ -66,35 +24,63 @@ app.post("/payment", async (req, res) => {
     const bank = bankMatch ? bankMatch[1].trim() : "";
     const mode = modeMatch ? modeMatch[1].trim() : "";
 
+    // ==========================
+    // Validate Labour
+    // ==========================
+
+    const labours = await getLabours();
+
+    const matches = labours.filter(
+      l => l.name.toLowerCase() === labour.toLowerCase()
+    );
+
+    if (matches.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: `No labour named "${labour}" found.`,
+      });
+    }
+
+    if (matches.length > 1) {
+      return res.status(400).json({
+        success: false,
+        needSelection: true,
+        type: "labour",
+        matches,
+      });
+    }
+
+    const selectedLabour = matches[0];
+
     const now = new Date();
 
-const date = now.toLocaleDateString("en-GB");
-const time = now.toLocaleTimeString("en-GB");
+    const date = now.toLocaleDateString("en-GB");
+    const time = now.toLocaleTimeString("en-GB");
 
-await sheets.spreadsheets.values.append({
-  spreadsheetId: SPREADSHEET_ID,
-  range: `${SHEET_NAME}!A:G`,
-  valueInputOption: "USER_ENTERED",
-  requestBody: {
-    values: [
-      [
-        date,      // Date
-        time,      // Time
-        labour,    // Labour Name
-        amount,    // Amount
-        bank,      // Bank
-        mode,      // Payment Method
-        ""         // Remarks (leave blank)
-      ],
-    ],
-  },
-});
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `${SHEET_NAME}!A:G`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            date,
+            time,
+            selectedLabour.name,
+            amount,
+            bank,
+            mode,
+            "",
+          ],
+        ],
+      },
+    });
 
     res.json({
       success: true,
       message: "Payment saved successfully.",
       data: {
-        labour,
+        labour: selectedLabour.name,
         amount,
         bank,
         mode,
@@ -109,14 +95,4 @@ await sheets.spreadsheets.values.append({
       message: err.message,
     });
   }
-});
-
-// =====================
-// Start Server
-// =====================
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`MAX API running on port ${PORT}`);
 });
