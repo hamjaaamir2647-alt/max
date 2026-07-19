@@ -1,5 +1,70 @@
+const express = require("express");
+const cors = require("cors");
+const { google } = require("googleapis");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// =====================
+// Google Authentication
+// =====================
+
+const auth = new google.auth.GoogleAuth({
+  credentials: {
+    project_id: process.env.GOOGLE_PROJECT_ID,
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  },
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+const sheets = google.sheets({
+  version: "v4",
+  auth,
+});
+
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
+const SHEET_NAME = "Labour Payments";
+const LABOUR_SHEET = "Labour Master";
+
+// =====================
+// Home
+// =====================
+
+app.get("/", (req, res) => {
+  res.send("✅ MAX API is running!");
+});
+
+// =====================
+// Read Labour Master
+// =====================
+
+async function getLabours() {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${LABOUR_SHEET}!A2:E`,
+  });
+
+  const rows = response.data.values || [];
+
+  return rows.map((row) => ({
+    id: row[0] || "",
+    name: row[1] || "",
+    mobile: row[2] || "",
+    status: row[3] || "",
+    address: row[4] || "",
+  }));
+}
+
+// =====================
+// Payment API
+// =====================
+
 app.post("/payment", async (req, res) => {
   try {
+
     const { command } = req.body;
 
     if (!command) {
@@ -12,11 +77,11 @@ app.post("/payment", async (req, res) => {
     console.log("Received:", command);
 
     // Example:
-    // Paid ₹5000 to Rahim from SBI by PhonePe
+    // Paid ₹5000 to Rajesh from SBI by PhonePe
 
     const amountMatch = command.match(/₹?\s?(\d+)/i);
-    const nameMatch = command.match(/to\s+([A-Za-z ]+?)\s+from/i);
-    const bankMatch = command.match(/from\s+([A-Za-z0-9 ]+?)\s+by/i);
+    const nameMatch = command.match(/to\s+(.+?)\s+from/i);
+    const bankMatch = command.match(/from\s+(.+?)\s+by/i);
     const modeMatch = command.match(/by\s+(.+)$/i);
 
     const amount = amountMatch ? amountMatch[1] : "";
@@ -24,16 +89,16 @@ app.post("/payment", async (req, res) => {
     const bank = bankMatch ? bankMatch[1].trim() : "";
     const mode = modeMatch ? modeMatch[1].trim() : "";
 
-    // ==========================
+    // =====================
     // Validate Labour
-    // ==========================
+    // =====================
 
     const labours = await getLabours();
- console.log("Labours found:", labours.length);
-console.log(labours);
+
+    console.log("Labours Found:", labours.length);
 
     const matches = labours.filter(
-      l => l.name.toLowerCase() === labour.toLowerCase()
+      (l) => l.name.toLowerCase() === labour.toLowerCase()
     );
 
     if (matches.length === 0) {
@@ -54,16 +119,24 @@ console.log(labours);
 
     const selectedLabour = matches[0];
 
+    // =====================
+    // Indian Date & Time
+    // =====================
+
     const now = new Date();
 
-const date = now.toLocaleDateString("en-GB", {
-  timeZone: "Asia/Kolkata"
-});
+    const date = now.toLocaleDateString("en-GB", {
+      timeZone: "Asia/Kolkata",
+    });
 
-const time = now.toLocaleTimeString("en-GB", {
-  timeZone: "Asia/Kolkata",
-  hour12: false
-});
+    const time = now.toLocaleTimeString("en-GB", {
+      timeZone: "Asia/Kolkata",
+      hour12: false,
+    });
+
+    // =====================
+    // Save Payment
+    // =====================
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
@@ -96,11 +169,23 @@ const time = now.toLocaleTimeString("en-GB", {
     });
 
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
       success: false,
       message: err.message,
     });
+
   }
+});
+
+// =====================
+// Start Server
+// =====================
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`✅ MAX API running on port ${PORT}`);
 });
