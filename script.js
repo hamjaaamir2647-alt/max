@@ -1,5 +1,3 @@
-alert("MAX JS Loaded");
-
 const API_URL = "https://max-api-4tx2.onrender.com/payment";
 
 const saveBtn = document.getElementById("saveBtn");
@@ -8,7 +6,6 @@ const status = document.getElementById("status");
 
 saveBtn.addEventListener("click", function () {
 
-    alert("Save button clicked");
 
     status.innerHTML = "Sending...";
 
