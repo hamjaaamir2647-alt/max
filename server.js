@@ -54,8 +54,14 @@ app.post("/payment", async (req, res) => {
 
     const now = new Date();
 
-    const date = now.toLocaleDateString("en-GB");
-    const time = now.toLocaleTimeString("en-GB");
+const date = now.toLocaleDateString("en-GB", {
+  timeZone: "Asia/Kolkata"
+});
+
+const time = now.toLocaleTimeString("en-GB", {
+  timeZone: "Asia/Kolkata",
+  hour12: false
+});
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
