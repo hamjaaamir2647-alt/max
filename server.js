@@ -85,7 +85,7 @@ app.post("/payment", async (req, res) => {
     // Paid ₹5000 to Rajesh from SBI by PhonePe
 
 const response = await client.models.generateContent({
-model: "gemini-2.5-flash-lite",
+model: "gemini-2.0-flash",
   contents: `Extract the payment details from this command and return ONLY valid JSON.
 
 Format:
