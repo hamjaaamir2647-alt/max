@@ -2,8 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const { google } = require("googleapis");
 const OpenAI = require("openai");
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const { GoogleGenAI } = require("@google/genai");
+
+const client = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 const app = express();
@@ -83,33 +85,32 @@ app.post("/payment", async (req, res) => {
     // Example:
     // Paid ₹5000 to Rajesh from SBI by PhonePe
 
-    const response = await client.chat.completions.create({
-  model: "gpt-4.1-mini",
-  messages: [
-    {
-      role: "system",
-      content: `Extract payment details and return ONLY valid JSON.
+const response = await client.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents: `Extract the payment details from this command and return ONLY valid JSON.
+
 Format:
 {
   "labour":"",
   "amount":"",
   "bank":"",
   "mode":""
-}`
-    },
-    {
-      role: "user",
-      content: command
-    }
-  ],
-  temperature: 0,
+}
+
+Command:
+${command}`
 });
 
-const content = response.choices[0].message.content.trim();
+const content = response.text.trim();
 
 console.log("AI Response:", content);
 
-const ai = JSON.parse(content);
+const clean = content
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
+
+const ai = JSON.parse(clean);
 
 const labour = ai.labour || "";
 const amount = ai.amount || "";
