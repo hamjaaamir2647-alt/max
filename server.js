@@ -111,8 +111,34 @@ for (const l of labours) {
 }
 
 // Extract bank
-const bankMatch = command.match(/from\s+([A-Za-z0-9]+)/i);
-const bank = bankMatch ? bankMatch[1] : "";
+let bank = "";
+const bankMatch = command.match(/from\s+(.+?)(?:\s+by|$)/i);
+
+if (bankMatch) {
+  const input = bankMatch[1].trim().toLowerCase();
+
+  const matches = banks.filter((b) =>
+    (b.alias || "")
+      .toLowerCase()
+      .split(",")
+      .map((a) => a.trim())
+      .includes(input)
+  );
+
+  if (matches.length === 1) {
+    bank = matches[0].account;
+  } else if (matches.length > 1) {
+    return res.json({
+      success: false,
+      message: "Multiple bank accounts found.",
+      options: matches.map((b) => ({
+        id: b.id,
+        account: b.account,
+        last4: b.last4,
+      })),
+    });
+  }
+}
 
 // Extract payment mode
 const modeMatch = command.match(/by\s+([A-Za-z]+)/i);
