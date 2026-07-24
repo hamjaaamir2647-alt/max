@@ -1,11 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { google } = require("googleapis");
-const { GoogleGenAI } = require("@google/genai");
 
-const client = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
 
 const app = express();
 
