@@ -75,6 +75,28 @@ async function getBanks() {
     alias: row[4] || "",
   }));
 }
+async function getNextTransactionId(prefix, sheetName) {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${sheetName}!A2:A`,
+  });
+
+  const rows = response.data.values || [];
+
+  if (rows.length === 0) {
+    return `${prefix}000001`;
+  }
+
+  const lastId = rows[rows.length - 1][0];
+
+  if (!lastId || !lastId.startsWith(prefix)) {
+    return `${prefix}000001`;
+  }
+
+  const number = parseInt(lastId.replace(prefix, ""), 10) + 1;
+
+  return `${prefix}${String(number).padStart(6, "0")}`;
+}
 // =====================
 // Payment API
 // =====================
@@ -96,6 +118,7 @@ app.post("/payment", async (req, res) => {
 // Get labour list first
 const labours = await getLabours();
 const banks = await getBanks();
+const transactionId = await getNextTransactionId("PAY", SHEET_NAME);
 
 // Extract amount
 const amountMatch = command.match(/\d+/);
@@ -228,29 +251,31 @@ console.log("Labours Found:", labours.length);
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
-          [
-            date,
-            time,
-            selectedLabour.name,
-            amount,
-            bank,
-            mode,
-            "",
-          ],
-        ],
+  [
+    transactionId,
+    date,
+    time,
+    selectedLabour.name,
+    amount,
+    bank,
+    mode,
+    "",
+  ],
+],
       },
     });
 
     res.json({
-      success: true,
-      message: "Payment saved successfully.",
-      data: {
-        labour: selectedLabour.name,
-        amount,
-        bank,
-        mode,
-      },
-    });
+  success: true,
+  message: "Payment saved successfully.",
+  data: {
+    transactionId,
+    labour: selectedLabour.name,
+    amount,
+    bank,
+    mode,
+  },
+});
 
   } catch (err) {
 
