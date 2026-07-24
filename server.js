@@ -29,6 +29,7 @@ const sheets = google.sheets({
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SHEET_NAME = "Labour Payments";
 const LABOUR_SHEET = "Labour Master";
+const BANK_SHEET = "Bank Accounts";
 
 // =====================
 // Home
@@ -58,7 +59,22 @@ async function getLabours() {
     address: row[4] || "",
   }));
 }
+async function getBanks() {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${BANK_SHEET}!A2:E`,
+  });
 
+  const rows = response.data.values || [];
+
+  return rows.map((row) => ({
+    id: row[0] || "",
+    bank: row[1] || "",
+    account: row[2] || "",
+    last4: row[3] || "",
+    alias: row[4] || "",
+  }));
+}
 // =====================
 // Payment API
 // =====================
