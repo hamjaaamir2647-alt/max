@@ -77,46 +77,31 @@ app.post("/payment", async (req, res) => {
 
     console.log("Received:", command);
 
-    // Example:
-    // Paid ₹5000 to Rajesh from SBI by PhonePe
+// Get labour list first
+const labours = await getLabours();
 
+// Extract amount
 const amountMatch = command.match(/\d+/);
+const amount = amountMatch ? amountMatch[0] : "";
 
-const ai = {
-  labour: "",
-  amount: amountMatch ? amountMatch[0] : "",
-  bank: "",
-  mode: ""
-};
-
-// Labour
+// Find labour
+let labour = "";
 for (const l of labours) {
   if (command.toLowerCase().includes(l.name.toLowerCase())) {
-    ai.labour = l.name;
+    labour = l.name;
     break;
   }
 }
 
-// Bank
+// Extract bank
 const bankMatch = command.match(/from\s+([A-Za-z0-9]+)/i);
-if (bankMatch) ai.bank = bankMatch[1];
+const bank = bankMatch ? bankMatch[1] : "";
 
-// Mode
+// Extract payment mode
 const modeMatch = command.match(/by\s+([A-Za-z]+)/i);
-if (modeMatch) ai.mode = modeMatch[1];
+const mode = modeMatch ? modeMatch[1] : "";
 
-const labour = ai.labour || "";
-const amount = ai.amount || "";
-const bank = ai.bank || "";
-const mode = ai.mode || "";
-
-    // =====================
-    // Validate Labour
-    // =====================
-
-    const labours = await getLabours();
-
-    console.log("Labours Found:", labours.length);
+console.log("Labours Found:", labours.length);
 
     const matches = labours.filter(
       (l) => l.name.toLowerCase() === labour.toLowerCase()
