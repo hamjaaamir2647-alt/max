@@ -141,8 +141,38 @@ if (bankMatch) {
 }
 
 // Extract payment mode
-const modeMatch = command.match(/by\s+([A-Za-z]+)/i);
-const mode = modeMatch ? modeMatch[1] : "";
+let mode = "";
+
+const text = command.toLowerCase();
+
+if (text.includes("cash")) {
+  mode = "Cash";
+} else if (
+  text.includes("googlepay") ||
+  text.includes("google pay") ||
+  text.includes("gpay")
+) {
+  mode = "Google Pay";
+} else if (
+  text.includes("phonepe") ||
+  text.includes("phone pe")
+) {
+  mode = "PhonePe";
+} else if (text.includes("paytm")) {
+  mode = "Paytm";
+} else if (text.includes("upi")) {
+  mode = "UPI";
+} else if (text.includes("neft")) {
+  mode = "NEFT";
+} else if (text.includes("rtgs")) {
+  mode = "RTGS";
+} else if (text.includes("imps")) {
+  mode = "IMPS";
+} else if (text.includes("cheque") || text.includes("check")) {
+  mode = "Cheque";
+} else {
+  mode = "";
+}
 
 console.log("Labours Found:", labours.length);
 
