@@ -80,32 +80,30 @@ app.post("/payment", async (req, res) => {
     // Example:
     // Paid ₹5000 to Rajesh from SBI by PhonePe
 
-const response = await client.models.generateContent({
-model: "gemini-2.0-flash",
-  contents: `Extract the payment details from this command and return ONLY valid JSON.
+const amountMatch = command.match(/\d+/);
 
-Format:
-{
-  "labour":"",
-  "amount":"",
-  "bank":"",
-  "mode":""
+const ai = {
+  labour: "",
+  amount: amountMatch ? amountMatch[0] : "",
+  bank: "",
+  mode: ""
+};
+
+// Labour
+for (const l of labours) {
+  if (command.toLowerCase().includes(l.name.toLowerCase())) {
+    ai.labour = l.name;
+    break;
+  }
 }
 
-Command:
-${command}`
-});
+// Bank
+const bankMatch = command.match(/from\s+([A-Za-z0-9]+)/i);
+if (bankMatch) ai.bank = bankMatch[1];
 
-const content = response.text.trim();
-
-console.log("AI Response:", content);
-
-const clean = content
-  .replace(/```json/g, "")
-  .replace(/```/g, "")
-  .trim();
-
-const ai = JSON.parse(clean);
+// Mode
+const modeMatch = command.match(/by\s+([A-Za-z]+)/i);
+if (modeMatch) ai.mode = modeMatch[1];
 
 const labour = ai.labour || "";
 const amount = ai.amount || "";
