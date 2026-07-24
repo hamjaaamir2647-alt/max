@@ -95,6 +95,7 @@ app.post("/payment", async (req, res) => {
 
 // Get labour list first
 const labours = await getLabours();
+const banks = await getBanks();
 
 // Extract amount
 const amountMatch = command.match(/\d+/);
