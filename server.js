@@ -102,10 +102,15 @@ const amountMatch = command.match(/\d+/);
 const amount = amountMatch ? amountMatch[0] : "";
 
 // Find labour
+const cleanCommand = command.toLowerCase().replace(/\s+/g, " ").trim();
+
 let labour = "";
+
 for (const l of labours) {
-  if (command.toLowerCase().includes(l.name.toLowerCase())) {
-    labour = l.name;
+  const name = l.toLowerCase().trim();
+
+  if (cleanCommand.includes(name)) {
+    labour = l;
     break;
   }
 }
