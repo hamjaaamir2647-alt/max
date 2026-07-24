@@ -87,7 +87,21 @@ async function getNextTransactionId(prefix, sheetName) {
     return `${prefix}000001`;
   }
 
-  const lastId = rows[rows.length - 1][0];
+  let lastId = "";
+
+for (let i = rows.length - 1; i >= 0; i--) {
+  if (rows[i][0] && rows[i][0].startsWith(prefix)) {
+    lastId = rows[i][0];
+    break;
+  }
+}
+
+if (!lastId) {
+  return `${prefix}000001`;
+}
+
+const number = parseInt(lastId.replace(prefix, ""), 10) + 1;
+return `${prefix}${String(number).padStart(6, "0")}`;
 
   if (!lastId || !lastId.startsWith(prefix)) {
     return `${prefix}000001`;
