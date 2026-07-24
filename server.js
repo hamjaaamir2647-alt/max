@@ -43,17 +43,21 @@ app.get("/", (req, res) => {
 // Read Labour Master
 // =====================
 
-const cleanCommand = command.toLowerCase().replace(/\s+/g, " ").trim();
+async function getLabours() {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${LABOUR_SHEET}!A2:E`,
+  });
 
-let labour = "";
+  const rows = response.data.values || [];
 
-for (const l of labours) {
-  const name = l.name.toLowerCase().trim();
-
-  if (cleanCommand.includes(name)) {
-    labour = l.name;   // Save only the labour name
-    break;
-  }
+  return rows.map((row) => ({
+    id: row[0] || "",
+    name: row[1] || "",
+    mobile: row[2] || "",
+    status: row[3] || "",
+    address: row[4] || "",
+  }));
 }
 async function getBanks() {
   const response = await sheets.spreadsheets.values.get({
@@ -103,10 +107,10 @@ const cleanCommand = command.toLowerCase().replace(/\s+/g, " ").trim();
 let labour = "";
 
 for (const l of labours) {
-  const name = l.toLowerCase().trim();
+  const name = l.name.toLowerCase().trim();
 
   if (cleanCommand.includes(name)) {
-    labour = l;
+    labour = l.name;
     break;
   }
 }
