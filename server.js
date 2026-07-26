@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { google } = require("googleapis");
 
+let pendingRequests = {};
 
 const app = express();
 
@@ -319,7 +320,7 @@ console.log("Labours Found:", labours.length);
 // =====================
 app.post("/receipt", async (req, res) => {
     try {
-    const { command } = req.body;
+    const { command, sessionId = "default" } = req.body;
 
     if (!command) {
       return res.status(400).json({
@@ -376,17 +377,25 @@ if (companyMatch) {
       if (matches.length === 1) {
         bank = matches[0].account;
       } else if (matches.length > 1) {
-        return res.json({
-          success: false,
-          message: "Multiple bank accounts found.",
-          options: matches.map((b) => ({
-            id: b.id,
-            account: b.account,
-            last4: b.last4,
-          })),
-        });
-      }
-    }
+
+  pendingRequests[sessionId] = {
+    type: "receipt",
+    command,
+    options: matches,
+  };
+
+  return res.json({
+    success: false,
+    message: "Multiple bank accounts found.",
+    pending: true,
+    options: matches.map((b) => ({
+      id: b.id,
+      account: b.account,
+      last4: b.last4,
+    })),
+  });
+
+}
           let mode = "";
 
     const text = command.toLowerCase();
