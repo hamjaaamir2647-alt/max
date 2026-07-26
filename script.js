@@ -20,9 +20,9 @@ const response = await fetch(API_URL + endpoint, {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                command: command.value
-            })
-        });
+    command: command.value,
+    sessionId: "amir"
+})
 
         const data = await response.json();
 
