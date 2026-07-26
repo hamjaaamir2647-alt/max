@@ -10,9 +10,14 @@ saveBtn.addEventListener("click", async function () {
 
     try {
 
-        const endpoint = command.value.toLowerCase().startsWith("received")
-  ? "/receipt"
-  : "/payment";
+        let endpoint = "/payment";
+
+if (
+    command.value.toLowerCase().startsWith("received") ||
+    /^\d+$/.test(command.value.trim())
+) {
+    endpoint = "/receipt";
+}
 
 const response = await fetch(API_URL + endpoint, {
             method: "POST",
