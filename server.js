@@ -320,7 +320,7 @@ console.log("Labours Found:", labours.length);
 // =====================
 app.post("/receipt", async (req, res) => {
     try {
-    const { command, sessionId = "default" } = req.body;
+    let { command, sessionId = "default" } = req.body;
       if (/^\d+$/.test(command) && pendingRequests[sessionId]) {
 
   const pending = pendingRequests[sessionId];
@@ -336,10 +336,9 @@ app.post("/receipt", async (req, res) => {
       });
     }
 
-    return res.json({
-      success: true,
-      message: `Selected ${selected.account} (${selected.last4})`
-    });
+    command = pending.command;
+delete pendingRequests[sessionId];
+req.selectedBank = selected.account;
 
   }
 
@@ -383,7 +382,7 @@ if (companyMatch) {
     }
   }
 }
-          let bank = "";
+          let bank = req.selectedBank || "";
     const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
     if (bankMatch) {
