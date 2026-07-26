@@ -339,14 +339,26 @@ app.post("/receipt", async (req, res) => {
     const cleanCommand = command.toLowerCase().replace(/\s+/g, " ").trim();
           let company = "";
 
-    for (const c of companies) {
-      const name = c.company.toLowerCase().trim();
+const companyMatch = command.match(/from\s+(.+?)(?:\s+by|\s+in|$)/i);
 
-      if (cleanCommand.includes(name)) {
-        company = c.company;
-        break;
-      }
+if (companyMatch) {
+  const input = companyMatch[1].trim().toLowerCase();
+
+  for (const c of companies) {
+    const companyName = c.company.toLowerCase();
+    const siteName = (c.site || "").toLowerCase();
+
+    if (
+      companyName.includes(input) ||
+      input.includes(companyName) ||
+      siteName.includes(input) ||
+      input.includes(siteName)
+    ) {
+      company = c.company;
+      break;
     }
+  }
+}
           let bank = "";
     const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
