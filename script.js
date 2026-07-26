@@ -1,4 +1,4 @@
-const API_URL = "https://max-api-4tx2.onrender.com/payment";
+const API_URL = "https://max-api-4tx2.onrender.com";
 
 const saveBtn = document.getElementById("saveBtn");
 const command = document.getElementById("command");
@@ -10,7 +10,11 @@ saveBtn.addEventListener("click", async function () {
 
     try {
 
-        const response = await fetch(API_URL, {
+        const endpoint = command.value.toLowerCase().startsWith("received")
+  ? "/receipt"
+  : "/payment";
+
+const response = await fetch(API_URL + endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
