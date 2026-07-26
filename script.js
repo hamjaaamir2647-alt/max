@@ -27,10 +27,28 @@ const response = await fetch(API_URL + endpoint, {
         const data = await response.json();
 
         if (data.success) {
-            status.innerHTML = "✅ " + data.message;
-        } else {
-            status.innerHTML = "❌ " + data.message;
-        }
+    status.innerHTML = "✅ " + data.message;
+} else {
+
+    if (data.options) {
+
+        let html = "❌ " + data.message + "<br><br>";
+
+        data.options.forEach((item, index) => {
+            html += `${index + 1}. ${item.account} (${item.last4})<br>`;
+        });
+
+        html += "<br><b>Type the number and press Save.</b>";
+
+        status.innerHTML = html;
+
+    } else {
+
+        status.innerHTML = "❌ " + data.message;
+
+    }
+
+}
 
     } catch (err) {
         status.innerHTML = "❌ " + err.message;
