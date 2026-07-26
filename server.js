@@ -315,6 +315,159 @@ console.log("Labours Found:", labours.length);
 });
 
 // =====================
+// Receipt API
+// =====================
+app.post("/receipt", async (req, res) => {
+    try {
+    const { command } = req.body;
+
+    if (!command) {
+      return res.status(400).json({
+        success: false,
+        message: "Command missing",
+      });
+    }
+
+    console.log("Receipt:", command);
+          const companies = await getCompanies();
+    const banks = await getBanks();
+    const transactionId = await getNextTransactionId("REC", RECEIPT_SHEET);
+
+    const amountMatch = command.match(/\d+/);
+    const amount = amountMatch ? amountMatch[0] : "";
+
+    const cleanCommand = command.toLowerCase().replace(/\s+/g, " ").trim();
+          let company = "";
+
+    for (const c of companies) {
+      const name = c.company.toLowerCase().trim();
+
+      if (cleanCommand.includes(name)) {
+        company = c.company;
+        break;
+      }
+    }
+          let bank = "";
+    const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
+
+    if (bankMatch) {
+      const input = bankMatch[1].trim().toLowerCase();
+
+      const matches = banks.filter((b) =>
+        (b.alias || "")
+          .toLowerCase()
+          .split(",")
+          .map((a) => a.trim())
+          .includes(input)
+      );
+
+      if (matches.length === 1) {
+        bank = matches[0].account;
+      } else if (matches.length > 1) {
+        return res.json({
+          success: false,
+          message: "Multiple bank accounts found.",
+          options: matches.map((b) => ({
+            id: b.id,
+            account: b.account,
+            last4: b.last4,
+          })),
+        });
+      }
+    }
+          let mode = "";
+
+    const text = command.toLowerCase();
+
+    if (text.includes("cash")) {
+      mode = "Cash";
+    } else if (
+      text.includes("googlepay") ||
+      text.includes("google pay") ||
+      text.includes("gpay")
+    ) {
+      mode = "Google Pay";
+    } else if (
+      text.includes("phonepe") ||
+      text.includes("phone pe")
+    ) {
+      mode = "PhonePe";
+    } else if (text.includes("paytm")) {
+      mode = "Paytm";
+    } else if (text.includes("upi")) {
+      mode = "UPI";
+    } else if (text.includes("neft")) {
+      mode = "NEFT";
+    } else if (text.includes("rtgs")) {
+      mode = "RTGS";
+    } else if (text.includes("imps")) {
+      mode = "IMPS";
+    } else if (text.includes("cheque") || text.includes("check")) {
+      mode = "Cheque";
+    }
+          const matches = companies.filter(
+      (c) => c.company.toLowerCase() === company.toLowerCase()
+    );
+
+    if (matches.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: `No company named "${company}" found.`,
+      });
+    }
+
+    const selectedCompany = matches[0];
+
+    const now = new Date();
+
+    const date = now.toLocaleDateString("en-GB", {
+      timeZone: "Asia/Kolkata",
+    });
+
+    const time = now.toLocaleTimeString("en-GB", {
+      timeZone: "Asia/Kolkata",
+      hour12: false,
+    });
+          await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `${RECEIPT_SHEET}!A:H`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[
+          transactionId,
+          date,
+          time,
+          selectedCompany.company,
+          amount,
+          bank,
+          mode,
+          ""
+        ]],
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Receipt saved successfully.",
+      data: {
+        transactionId,
+        company: selectedCompany.company,
+        amount,
+        bank,
+        mode,
+      },
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+// =====================
 // Start Server
 // =====================
 
