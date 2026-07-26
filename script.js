@@ -26,6 +26,8 @@ const response = await fetch(API_URL + endpoint, {
 
         const data = await response.json();
 
+        console.log(data);
+        
         if (data.success) {
     status.innerHTML = "✅ " + data.message;
 } else {
