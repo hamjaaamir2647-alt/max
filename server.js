@@ -419,6 +419,7 @@ if (companyMatch) {
   });
 
 }
+    }
           let mode = "";
 
     const text = command.toLowerCase();
