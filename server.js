@@ -321,6 +321,29 @@ console.log("Labours Found:", labours.length);
 app.post("/receipt", async (req, res) => {
     try {
     const { command, sessionId = "default" } = req.body;
+      if (/^\d+$/.test(command) && pendingRequests[sessionId]) {
+
+  const pending = pendingRequests[sessionId];
+
+  if (pending.type === "receipt") {
+
+    const selected = pending.options[parseInt(command) - 1];
+
+    if (!selected) {
+      return res.json({
+        success: false,
+        message: "Invalid option."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Selected ${selected.account} (${selected.last4})`
+    });
+
+  }
+
+}
 
     if (!command) {
       return res.status(400).json({
