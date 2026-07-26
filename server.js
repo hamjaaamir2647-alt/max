@@ -121,14 +121,6 @@ if (!lastId) {
 
 const number = parseInt(lastId.replace(prefix, ""), 10) + 1;
 return `${prefix}${String(number).padStart(6, "0")}`;
-
-  if (!lastId || !lastId.startsWith(prefix)) {
-    return `${prefix}000001`;
-  }
-
-  const number = parseInt(lastId.replace(prefix, ""), 10) + 1;
-
-  return `${prefix}${String(number).padStart(6, "0")}`;
 }
 // =====================
 // Payment API
@@ -280,7 +272,7 @@ console.log("Labours Found:", labours.length);
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:G`,
+      range: `${SHEET_NAME}!A:H`,
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
