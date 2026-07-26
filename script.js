@@ -23,7 +23,7 @@ const response = await fetch(API_URL + endpoint, {
     command: command.value,
     sessionId: "amir"
 })
-
+});
         const data = await response.json();
 
         console.log(data);
