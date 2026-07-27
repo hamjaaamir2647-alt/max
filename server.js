@@ -330,6 +330,12 @@ app.post("/receipt", async (req, res) => {
     command = `${pending.command} in ${command}`;
     delete pendingRequests[sessionId];
   }
+    else if (pending.type === "receipt_mode" && !/^\d+$/.test(command)) {
+
+  command = `${pending.command} by ${command}`;
+  delete pendingRequests[sessionId];
+
+}
 
   // User selected bank number (e.g. 1 or 2)
   else if (pending.type === "receipt" && /^\d+$/.test(command)) {
@@ -440,6 +446,38 @@ const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
 }
     }
+      const text = command.toLowerCase();
+
+const hasMode =
+  text.includes("cash") ||
+  text.includes("googlepay") ||
+  text.includes("google pay") ||
+  text.includes("gpay") ||
+  text.includes("phonepe") ||
+  text.includes("phone pe") ||
+  text.includes("paytm") ||
+  text.includes("upi") ||
+  text.includes("neft") ||
+  text.includes("rtgs") ||
+  text.includes("imps") ||
+  text.includes("cheque") ||
+  text.includes("check");
+
+if (!hasMode) {
+
+  pendingRequests[sessionId] = {
+    type: "receipt_mode",
+    command,
+    bank: bank
+  };
+
+  return res.json({
+    success: false,
+    pending: true,
+    message: "Which payment mode? (Cash / UPI / NEFT / RTGS / IMPS)"
+  });
+
+}
           let mode = "";
 
     const text = command.toLowerCase();
