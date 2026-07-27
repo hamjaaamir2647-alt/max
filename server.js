@@ -387,9 +387,7 @@ if (companyMatch) {
   }
 }
           let bank = req.selectedBank || "";
-    const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
-
-    const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
+const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
       if (!bankMatch && !req.selectedBank) {
 
