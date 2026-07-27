@@ -447,7 +447,6 @@ const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 }
     }
   
-
 const hasMode =
   text.includes("cash") ||
   text.includes("googlepay") ||
