@@ -10,12 +10,9 @@ saveBtn.addEventListener("click", async function () {
 
     try {
 
-        let endpoint = "/payment";
+        let endpoint = sessionStorage.getItem("currentEndpoint") || "/payment";
 
-if (
-    command.value.toLowerCase().startsWith("received") ||
-    /^\d+$/.test(command.value.trim())
-) {
+if (command.value.toLowerCase().startsWith("received")) {
     endpoint = "/receipt";
 }
 
@@ -30,6 +27,9 @@ const response = await fetch(API_URL + endpoint, {
 })
 });
         const data = await response.json();
+        if (data.pending) {
+    sessionStorage.setItem("currentEndpoint", endpoint);
+}
 
         console.log(data);
         
