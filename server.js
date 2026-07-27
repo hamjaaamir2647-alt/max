@@ -385,7 +385,7 @@ if (companyMatch) {
           let bank = req.selectedBank || "";
     const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
-    if (bankMatch) {
+    if (bankMatch && !req.selectedBank) {
       const input = bankMatch[1].trim().toLowerCase();
 
       const matches = banks.filter((b) =>
