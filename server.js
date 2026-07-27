@@ -385,7 +385,23 @@ if (companyMatch) {
           let bank = req.selectedBank || "";
     const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
-    if (bankMatch && !req.selectedBank) {
+    const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
+
+      if (!bankMatch && !req.selectedBank) {
+
+  pendingRequests[sessionId] = {
+    type: "receipt_bank",
+    command
+  };
+
+  return res.json({
+    success: false,
+    pending: true,
+    message: "Which bank received the money?"
+  });
+
+}
+  if (bankMatch && !req.selectedBank) {
       const input = bankMatch[1].trim().toLowerCase();
 
       const matches = banks.filter((b) =>
@@ -490,7 +506,9 @@ if (companyMatch) {
       },
     });
 
-    res.json({
+    delete pendingRequests[sessionId];
+      
+      res.json({
       success: true,
       message: "Receipt saved successfully.",
       data: {
