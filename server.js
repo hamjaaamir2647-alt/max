@@ -321,16 +321,18 @@ console.log("Labours Found:", labours.length);
 app.post("/receipt", async (req, res) => {
     try {
     let { command, sessionId = "default" } = req.body;
-      if (/^\d+$/.test(command) && pendingRequests[sessionId]) {
+      if (pendingRequests[sessionId]) {
 
   const pending = pendingRequests[sessionId];
-        if (pending && pending.type === "receipt_bank" && !/^\d+$/.test(command)) {
-  command = `${pending.command} in ${command}`;
-  console.log("Rebuilt command:", command);
-  delete pendingRequests[sessionId];
-}
 
-  if (pending.type === "receipt") {
+  // User replied with bank name (e.g. SBI)
+  if (pending.type === "receipt_bank" && !/^\d+$/.test(command)) {
+    command = `${pending.command} in ${command}`;
+    delete pendingRequests[sessionId];
+  }
+
+  // User selected bank number (e.g. 1 or 2)
+  else if (pending.type === "receipt" && /^\d+$/.test(command)) {
 
     const selected = pending.options[parseInt(command) - 1];
 
@@ -342,9 +344,8 @@ app.post("/receipt", async (req, res) => {
     }
 
     command = pending.command;
-delete pendingRequests[sessionId];
-req.selectedBank = selected.account;
-
+    req.selectedBank = selected.account;
+    delete pendingRequests[sessionId];
   }
 
 }
