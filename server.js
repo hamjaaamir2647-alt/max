@@ -446,7 +446,7 @@ const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 
 }
     }
-      const text = command.toLowerCase();
+  
 
 const hasMode =
   text.includes("cash") ||
