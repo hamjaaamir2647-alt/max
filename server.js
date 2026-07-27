@@ -405,6 +405,7 @@ const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
 }
   if (bankMatch && !req.selectedBank) {
       const input = bankMatch[1].trim().toLowerCase();
+    console.log("Bank input:", input);
 
       const matches = banks.filter((b) =>
         (b.alias || "")
