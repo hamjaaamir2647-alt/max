@@ -324,8 +324,9 @@ app.post("/receipt", async (req, res) => {
       if (/^\d+$/.test(command) && pendingRequests[sessionId]) {
 
   const pending = pendingRequests[sessionId];
-        if (pending.type === "receipt_bank" && !/^\d+$/.test(command)) {
+        if (pending && pending.type === "receipt_bank" && !/^\d+$/.test(command)) {
   command = `${pending.command} in ${command}`;
+  console.log("Rebuilt command:", command);
   delete pendingRequests[sessionId];
 }
 
