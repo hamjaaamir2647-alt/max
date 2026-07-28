@@ -448,19 +448,19 @@ const bankMatch = command.match(/in\s+(.+?)(?:\s+by|$)/i);
     }
   
 const hasMode =
-  text.includes("cash") ||
-  text.includes("googlepay") ||
-  text.includes("google pay") ||
-  text.includes("gpay") ||
-  text.includes("phonepe") ||
-  text.includes("phone pe") ||
-  text.includes("paytm") ||
-  text.includes("upi") ||
-  text.includes("neft") ||
-  text.includes("rtgs") ||
-  text.includes("imps") ||
-  text.includes("cheque") ||
-  text.includes("check");
+  command.toLowerCase().includes("cash") ||
+  command.toLowerCase().includes("googlepay") ||
+  command.toLowerCase().includes("google pay") ||
+  command.toLowerCase().includes("gpay") ||
+  command.toLowerCase().includes("phonepe") ||
+  command.toLowerCase().includes("phone pe") ||
+  command.toLowerCase().includes("paytm") ||
+  command.toLowerCase().includes("upi") ||
+  command.toLowerCase().includes("neft") ||
+  command.toLowerCase().includes("rtgs") ||
+  command.toLowerCase().includes("imps") ||
+  command.toLowerCase().includes("cheque") ||
+  command.toLowerCase().includes("check");
 
 if (!hasMode) {
 
