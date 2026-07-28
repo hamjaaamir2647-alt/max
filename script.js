@@ -24,7 +24,28 @@ if (SpeechRecognition) {
 
 });
 
+    recognition.onstart = function () {
+
+    micBtn.innerHTML = "🔴 Listening...";
+    micBtn.disabled = true;
+
+    status.innerHTML = "🎤 Listening... Please speak.";
+
+};
+    
     recognition.onresult = function (event) {
+
+    command.value = event.results[0][0].transcript;
+
+    status.innerHTML = "✅ Heard: " + command.value;
+
+};
+    recognition.onend = function () {
+
+    micBtn.innerHTML = "🎤 Speak";
+    micBtn.disabled = false;
+
+};
         command.value = event.results[0][0].transcript;
     };
 
