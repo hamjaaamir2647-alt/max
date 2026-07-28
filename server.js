@@ -349,7 +349,7 @@ app.post("/receipt", async (req, res) => {
       });
     }
 
-    command = pending.command;
+    command = `${pending.command} in ${selected.account}`;
     req.selectedBank = selected.account;
     delete pendingRequests[sessionId];
   }
