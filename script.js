@@ -10,6 +10,7 @@ if (SpeechRecognition) {
     recognition.lang = "en-IN";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
+    recognition.continuous = false;
 
     micBtn.addEventListener("click", () => {
 
