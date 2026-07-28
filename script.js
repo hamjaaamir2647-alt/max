@@ -76,9 +76,15 @@ saveBtn.addEventListener("click", async function () {
 
     try {
 
-        let endpoint = sessionStorage.getItem("currentEndpoint") || "/payment";
+ let endpoint = "/payment";
 
-if (command.value.toLowerCase().startsWith("received")) {
+const text = command.value.toLowerCase().trim();
+
+if (
+    text.startsWith("received") ||
+    text.startsWith("receive") ||
+    text.startsWith("got")
+) {
     endpoint = "/receipt";
 }
 
