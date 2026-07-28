@@ -12,8 +12,16 @@ if (SpeechRecognition) {
     recognition.maxAlternatives = 1;
 
     micBtn.addEventListener("click", () => {
+
+    alert("Speak button clicked");
+
+    try {
         recognition.start();
-    });
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+
+});
 
     recognition.onresult = function (event) {
         command.value = event.results[0][0].transcript;
