@@ -333,6 +333,8 @@ app.post("/receipt", async (req, res) => {
     else if (pending.type === "receipt_mode" && !/^\d+$/.test(command)) {
 
   command = `${pending.command} by ${command}`;
+  req.selectedBank = pending.bank;
+
   delete pendingRequests[sessionId];
 
 }
