@@ -14,12 +14,11 @@ if (SpeechRecognition) {
 
     micBtn.addEventListener("click", () => {
 
-    alert("Speak button clicked");
 
     try {
         recognition.start();
     } catch (err) {
-        alert("Error: " + err.message);
+        status.innerHTML = "❌ " + err.message;
     }
 
 });
