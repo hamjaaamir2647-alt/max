@@ -46,8 +46,6 @@ if (SpeechRecognition) {
     micBtn.disabled = false;
 
 };
-        command.value = event.results[0][0].transcript;
-    };
 
     recognition.onerror = function (event) {
         alert("Microphone Error: " + event.error);
