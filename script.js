@@ -1,3 +1,34 @@
+const micBtn = document.getElementById("micBtn");
+
+const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    micBtn.addEventListener("click", () => {
+        recognition.start();
+    });
+
+    recognition.onresult = function (event) {
+        command.value = event.results[0][0].transcript;
+    };
+
+    recognition.onerror = function (event) {
+        alert("Microphone Error: " + event.error);
+    };
+
+} else {
+
+    alert("Speech Recognition is not supported in this browser.");
+
+}
+
 const API_URL = "https://max-api-4tx2.onrender.com";
 
 const saveBtn = document.getElementById("saveBtn");
