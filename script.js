@@ -4,6 +4,13 @@ const saveBtn = document.getElementById("saveBtn");
 const command = document.getElementById("command");
 const status = document.getElementById("status");
 
+command.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        saveBtn.click();
+    }
+});
+
 saveBtn.addEventListener("click", async function () {
 
     status.innerHTML = "Sending...";
