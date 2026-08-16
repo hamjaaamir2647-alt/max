@@ -253,6 +253,17 @@ console.log("Labours Found:", labours.length);
     const selectedLabour = matches[0];
 
     // =====================
+// Validate Payment Before Saving
+// =====================
+
+if (!selectedLabour.name || !amount || !bank || !mode) {
+  return res.status(400).json({
+    success: false,
+    message: "Incomplete payment information. Payment not saved."
+  });
+}
+
+    // =====================
     // Indian Date & Time
     // =====================
 
