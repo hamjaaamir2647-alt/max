@@ -156,8 +156,8 @@ console.log("COMMAND RECEIVED:", command);
 
         // Rebuild the original payment command
         command = pending.command.replace(
-  /from\s+(.+?)(?=\s+by\b|$)/i,
-  `from ${selected.account} ${selected.last4}`
+  /\s+by\s+/i,
+  ` from ${selected.account} ${selected.last4} by `
 );
 
         delete pendingRequests[sessionId];
