@@ -75,16 +75,20 @@ saveBtn.addEventListener("click", async function () {
 
     try {
 
- let endpoint = "/payment";
+ let endpoint = sessionStorage.getItem("currentEndpoint");
 
 const text = command.value.toLowerCase().trim();
 
-if (
-    text.startsWith("received") ||
-    text.startsWith("receive") ||
-    text.startsWith("got")
-) {
-    endpoint = "/receipt";
+if (!endpoint) {
+    endpoint = "/payment";
+
+    if (
+        text.startsWith("received") ||
+        text.startsWith("receive") ||
+        text.startsWith("got")
+    ) {
+        endpoint = "/receipt";
+    }
 }
 
 const response = await fetch(API_URL + endpoint, {
