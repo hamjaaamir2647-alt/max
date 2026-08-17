@@ -130,7 +130,30 @@ return `${prefix}${String(number).padStart(6, "0")}`;
 app.post("/payment", async (req, res) => {
   try {
 
-    const { command } = req.body;
+    let { command, sessionId = "default" } = req.body;
+
+    // Handle pending bank selection
+    if (pendingRequests[sessionId]) {
+
+      const pending = pendingRequests[sessionId];
+
+      if (pending.type === "payment_bank" && /^\d+$/.test(command)) {
+
+        const selected = pending.options[parseInt(command) - 1];
+
+        if (!selected) {
+          return res.json({
+            success: false,
+            message: "Invalid bank option."
+          });
+        }
+
+        // Rebuild the original payment command
+        command = `${pending.command} from ${selected.account}`;
+
+        delete pendingRequests[sessionId];
+      }
+    }
 
     if (!command) {
       return res.status(400).json({
@@ -164,26 +187,67 @@ for (const l of labours) {
   }
 }
 
-// Extract bank
+// =====================
+// Extract Bank
+// =====================
+
 let bank = "";
+
 const bankMatch = command.match(/from\s+(.+?)(?:\s+by|$)/i);
 
 if (bankMatch) {
+
   const input = bankMatch[1].trim().toLowerCase();
 
-  const matches = banks.filter((b) =>
-    (b.alias || "")
+  // Remove spaces and special characters for flexible matching
+  const normalizeBankText = (value) =>
+    (value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  const normalizedInput = normalizeBankText(input);
+
+  const matches = banks.filter((b) => {
+
+    const aliases = (b.alias || "")
       .toLowerCase()
       .split(",")
-      .map((a) => a.trim())
-      .includes(input)
-  );
+      .map((a) => normalizeBankText(a.trim()));
+
+    const accountName = normalizeBankText(b.account);
+    const bankName = normalizeBankText(b.bank);
+    const last4 = normalizeBankText(b.last4);
+
+    // Existing aliases
+    if (aliases.includes(normalizedInput)) {
+      return true;
+    }
+
+    // Example:
+    // "SBI Savings 8113"
+    if (
+      normalizedInput === `${accountName}${last4}` ||
+      normalizedInput === `${bankName}${last4}`
+    ) {
+      return true;
+    }
+
+    return false;
+  });
 
   if (matches.length === 1) {
+
     bank = matches[0].account;
+
   } else if (matches.length > 1) {
+
+    pendingRequests[sessionId] = {
+      type: "payment_bank",
+      command,
+      options: matches
+    };
+
     return res.json({
       success: false,
+      pending: true,
       message: "Multiple bank accounts found.",
       options: matches.map((b) => ({
         id: b.id,
