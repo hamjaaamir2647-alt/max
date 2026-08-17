@@ -239,13 +239,20 @@ if (bankMatch) {
 
   } else if (matches.length > 1) {
 
-    pendingRequests[sessionId] = {
-      type: "payment_bank",
-      command,
-      options: matches
-    };
+  // Remove the ambiguous bank name from the command
+  // before waiting for the user's account selection.
+  const commandWithoutBank = command
+    .replace(/from\s+(.+?)(?:\s+by|$)/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-    return res.json({
+  pendingRequests[sessionId] = {
+    type: "payment_bank",
+    command: commandWithoutBank,
+    options: matches
+  };
+
+  return res.json({
       success: false,
       pending: true,
       message: "Multiple bank accounts found.",
