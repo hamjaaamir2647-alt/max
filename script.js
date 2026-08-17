@@ -112,6 +112,8 @@ const response = await fetch(API_URL + endpoint, {
 
     sessionStorage.removeItem("currentEndpoint");
 
+    command.value = "";
+
     status.innerHTML = "✅ " + data.message;
 
 }
