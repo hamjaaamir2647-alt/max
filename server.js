@@ -149,7 +149,10 @@ app.post("/payment", async (req, res) => {
         }
 
         // Rebuild the original payment command
-        command = `${pending.command} from ${selected.account}`;
+        command = pending.command.replace(
+  /from\s+(.+?)(?=\s+by\b|$)/i,
+  `from ${selected.account} ${selected.last4}`
+);
 
         delete pendingRequests[sessionId];
       }
