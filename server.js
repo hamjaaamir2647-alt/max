@@ -251,9 +251,9 @@ if (bankMatch) {
   // Remove the ambiguous bank name from the command
   // before waiting for the user's account selection.
   const commandWithoutBank = command
-    .replace(/from\s+(.+?)(?:\s+by|$)/i, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  .replace(/from\s+(.+?)(?=\s+by\b)/i, "")
+  .replace(/\s+/g, " ")
+  .trim();
 
   pendingRequests[sessionId] = {
     type: "payment_bank",
