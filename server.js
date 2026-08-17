@@ -131,13 +131,19 @@ app.post("/payment", async (req, res) => {
   try {
 
     let { command, sessionId = "default" } = req.body;
+   
+    console.log("SESSION ID:", sessionId);
+console.log("COMMAND RECEIVED:", command);
 
     // Handle pending bank selection
     if (pendingRequests[sessionId]) {
 
-      const pending = pendingRequests[sessionId];
+  console.log("PENDING FOUND:", pendingRequests[sessionId]);
+  console.log("CURRENT COMMAND:", command);
 
-      if (pending.type === "payment_bank" && /^\d+$/.test(command)) {
+  const pending = pendingRequests[sessionId];
+
+  if (pending.type === "payment_bank" && /^\d+$/.test(command)) {
 
         const selected = pending.options[parseInt(command) - 1];
 
